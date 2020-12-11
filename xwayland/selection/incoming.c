@@ -15,6 +15,7 @@
  * Write the X11 selection to a Wayland client.
  */
 static int xwm_data_source_write(int fd, uint32_t mask, void *data) {
+  wlr_log(WLR_DEBUG, "xwm_data_source_write(%d, %08x, %p)", fd, mask, data);
 	struct wlr_xwm_selection_transfer *transfer = data;
 	struct wlr_xwm *xwm = transfer->selection->xwm;
 
