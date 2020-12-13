@@ -67,6 +67,7 @@ static void xwm_write_property(struct wlr_xwm_selection_transfer *transfer,
 	if (transfer->property_reply != NULL) {
 		struct wl_event_loop *loop =
 			wl_display_get_event_loop(xwm->xwayland->wl_display);
+		wlr_log(WLR_DEBUG, "transfer %p, source %p, fd %d, reply %p", transfer,  transfer->source, transfer->source_fd, reply);
 		transfer->source = wl_event_loop_add_fd(loop,
 			transfer->source_fd, WL_EVENT_WRITABLE, xwm_data_source_write,
 			transfer);
