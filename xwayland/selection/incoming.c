@@ -15,7 +15,7 @@
  * Write the X11 selection to a Wayland client.
  */
 static int xwm_data_source_write(int fd, uint32_t mask, void *data) {
-  wlr_log(WLR_DEBUG, "xwm_data_source_write(%d, %08x, %p)", fd, mask, data);
+	wlr_log(WLR_DEBUG, "xwm_data_source_write(%d, %08x, %p)", fd, mask, data);
 	struct wlr_xwm_selection_transfer *transfer = data;
 	struct wlr_xwm *xwm = transfer->selection->xwm;
 
@@ -57,21 +57,19 @@ static int xwm_data_source_write(int fd, uint32_t mask, void *data) {
 
 static void xwm_write_property(struct wlr_xwm_selection_transfer *transfer,
 		xcb_get_property_reply_t *reply) {
-	struct wlr_xwm *xwm = transfer->selection->xwm;
+	if (transfer->property_reply == NULL && reply != NULL) {
+		struct wlr_xwm *xwm = transfer->selection->xwm;
+		struct wl_event_loop *loop =
+			wl_display_get_event_loop(xwm->xwayland->wl_display);
+		transfer->source = wl_event_loop_add_fd(loop,
+			transfer->source_fd, WL_EVENT_WRITABLE, xwm_data_source_write,
+			transfer);
+	}
 
 	transfer->property_start = 0;
 	transfer->property_reply = reply;
 
 	xwm_data_source_write(transfer->source_fd, WL_EVENT_WRITABLE, transfer);
-
-	if (transfer->property_reply != NULL) {
-		struct wl_event_loop *loop =
-			wl_display_get_event_loop(xwm->xwayland->wl_display);
-		wlr_log(WLR_DEBUG, "transfer %p, source %p, fd %d, reply %p", transfer,  transfer->source, transfer->source_fd, reply);
-		transfer->source = wl_event_loop_add_fd(loop,
-			transfer->source_fd, WL_EVENT_WRITABLE, xwm_data_source_write,
-			transfer);
-	}
 }
 
 void xwm_get_incr_chunk(struct wlr_xwm_selection_transfer *transfer) {
