@@ -57,7 +57,11 @@ static int xwm_data_source_write(int fd, uint32_t mask, void *data) {
 
 static void xwm_write_property(struct wlr_xwm_selection_transfer *transfer,
 		xcb_get_property_reply_t *reply) {
-	if (transfer->property_reply == NULL && reply != NULL) {
+	if (transfer->source != NULL) {
+		return;
+	}
+
+	if (reply != NULL) {
 		struct wlr_xwm *xwm = transfer->selection->xwm;
 		struct wl_event_loop *loop =
 			wl_display_get_event_loop(xwm->xwayland->wl_display);
